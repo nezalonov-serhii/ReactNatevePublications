@@ -13,13 +13,13 @@ export default function App() {
       return null;
    }
 
-   if (fontsLoaded) {
-      return <LoginScreen />;
-   }
-
    // if (fontsLoaded) {
-   //    return <RegistrationScreen />;
+   //    return <LoginScreen />;
    // }
+
+   if (fontsLoaded) {
+      return <RegistrationScreen />;
+   }
 
    return <></>;
 }
