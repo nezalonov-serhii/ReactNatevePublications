@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
    ImageBackground,
@@ -36,6 +36,21 @@ export default function LoginScreen() {
    const handelShowPassword = () => {
       setShowPassword(!showPassword);
    };
+
+   useEffect(() => {
+      const keyboardDidShow = Keyboard.addListener("keyboardDidShow", () => {
+         setIsShowKeyboard(true);
+      });
+
+      const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+         setIsShowKeyboard(false);
+      });
+
+      return () => {
+         keyboardDidShow.remove();
+         keyboardDidHide.remove();
+      };
+   }, []);
 
    return (
       <TouchableWithoutFeedback onPress={keyboardHide}>
