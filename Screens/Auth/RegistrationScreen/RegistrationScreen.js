@@ -13,7 +13,7 @@ import {
 import { styles } from "../Auth.styled";
 import { useState, useEffect } from "react";
 
-export default function RegistrationScreen() {
+export default function RegistrationScreen({ navigation }) {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
@@ -117,9 +117,14 @@ export default function RegistrationScreen() {
                         <Text style={styles.submitTitle}>Зареєстуватися</Text>
                      </TouchableOpacity>
                   </KeyboardAvoidingView>
-                  <Text style={{ ...styles.isAuth, marginBottom: isShowKeyboard ? -116 : 78 }}>
-                     Вже є акаунт? Увійти
-                  </Text>
+                  <TouchableOpacity
+                     activeOpacity={0.6}
+                     onPress={() => navigation.navigate("Login")}
+                  >
+                     <Text style={{ ...styles.isAuth, marginBottom: isShowKeyboard ? -116 : 78 }}>
+                        Вже є акаунт? <Text style={styles.isAuthLink}>Увійти</Text>
+                     </Text>
+                  </TouchableOpacity>
                </View>
             </ImageBackground>
          </View>

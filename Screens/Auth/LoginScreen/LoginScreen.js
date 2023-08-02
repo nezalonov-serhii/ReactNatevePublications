@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { styles } from "../Auth.styled";
 
-export default function LoginScreen() {
+export function LoginScreen({ navigation }) {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
@@ -95,10 +95,14 @@ export default function LoginScreen() {
                         <Text style={styles.submitTitle}>Увійти</Text>
                      </TouchableOpacity>
                   </KeyboardAvoidingView>
-
-                  <Text style={{ ...styles.isAuth, marginBottom: isShowKeyboard ? -120 : 144 }}>
-                     Немає акаунту? Зареєструватися
-                  </Text>
+                  <TouchableOpacity
+                     activeOpacity={0.6}
+                     onPress={() => navigation.navigate("Register")}
+                  >
+                     <Text style={{ ...styles.isAuth, marginBottom: isShowKeyboard ? -120 : 144 }}>
+                        Немає акаунту? <Text style={styles.isAuthLink}>Зареєструватися</Text>
+                     </Text>
+                  </TouchableOpacity>
                </View>
             </ImageBackground>
          </View>

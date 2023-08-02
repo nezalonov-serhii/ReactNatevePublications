@@ -99,4 +99,14 @@ export const styles = StyleSheet.create({
       color: "#1B4371",
       fontFamily: "Roboto-Regular",
    },
+   isAuthLink: {
+      fontStyle: "normal",
+      fontWeight: "400",
+      fontSize: 16,
+      lineHeight: 19,
+      textAlign: "center",
+      color: "#1B4371",
+      textDecorationLine: "underline",
+      fontFamily: "Roboto-Regular",
+   },
 });
