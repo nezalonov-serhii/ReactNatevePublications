@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
+import { useDispatch } from "react-redux";
 import {
    ImageBackground,
    Keyboard,
@@ -11,14 +12,15 @@ import {
    View,
 } from "react-native";
 import { styles } from "../Auth.styled";
+import { loginAuth } from "../../../redux/slices/authSlice";
 
-export function LoginScreen({ navigation, route }) {
+export function LoginScreen({ navigation }) {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [showPassword, setShowPassword] = useState(true);
 
-   const setIsAuth = route.params.setIsAuth;
+   const dispatch = useDispatch();
 
    const keyboardHide = () => {
       setIsShowKeyboard(false);
@@ -29,7 +31,7 @@ export function LoginScreen({ navigation, route }) {
       setIsShowKeyboard(false);
       Keyboard.dismiss();
 
-      setIsAuth(true);
+      dispatch(loginAuth());
       console.log({ email, password });
 
       setEmail("");

@@ -6,7 +6,7 @@ import { Home } from "../Screens/Home";
 
 const AuthStack = createStackNavigator();
 
-export const useRoute = (isAuth, setIsAuth) => {
+export const useRouter = (isAuth) => {
    if (!isAuth) {
       return (
          <AuthStack.Navigator>
@@ -14,17 +14,15 @@ export const useRoute = (isAuth, setIsAuth) => {
                options={{ headerShown: false }}
                name="Login"
                component={LoginScreen}
-               initialParams={{ setIsAuth: setIsAuth }}
             />
             <AuthStack.Screen
                options={{ headerShown: false }}
                name="Register"
                component={RegistrationScreen}
-               initialParams={{ setIsAuth: setIsAuth }}
             />
          </AuthStack.Navigator>
       );
    }
 
-   return <Home setIsAuth={setIsAuth}></Home>;
+   return <Home />;
 };

@@ -12,15 +12,17 @@ import {
 } from "react-native";
 import { styles } from "../Auth.styled";
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux"; // Импортируем хук useDispatch
+import { loginAuth } from "../../../redux/slices/authSlice";
 
-export function RegistrationScreen({ navigation, route }) {
+export function RegistrationScreen({ navigation }) {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [login, setLogin] = useState("");
    const [showPassword, setShowPassword] = useState(true);
 
-   const setIsAuth = route.params.setIsAuth;
+   const dispatch = useDispatch(); // Получаем функцию dispatch из хука useDispatch
 
    const keyboardHide = () => {
       setIsShowKeyboard(false);
@@ -31,7 +33,7 @@ export function RegistrationScreen({ navigation, route }) {
       setIsShowKeyboard(false);
       Keyboard.dismiss();
 
-      setIsAuth(true);
+      dispatch(loginAuth());
       console.log({ email, password, login });
 
       setEmail("");

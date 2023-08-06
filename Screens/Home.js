@@ -6,10 +6,13 @@ import { PostsScreen } from "../Screens/MainScreen/PostsScreen/PostsScreen";
 import { CreateScreen } from "../Screens/MainScreen/CreateScreen/CreateScreen";
 import { ProfileScreen } from "../Screens/MainScreen/ProfileScreen/ProfileScreen";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useDispatch } from "react-redux";
+import { logoutAuth } from "../redux/slices/authSlice";
 
 const MainTab = createBottomTabNavigator();
 
-export const Home = ({ setIsAuth }) => {
+export const Home = () => {
+   const dispatch = useDispatch();
    return (
       <MainTab.Navigator
          screenOptions={{
@@ -35,7 +38,7 @@ export const Home = ({ setIsAuth }) => {
                      color="black"
                      style={{ marginRight: 16 }}
                      onPress={() => {
-                        setIsAuth(false);
+                        dispatch(logoutAuth());
                      }}
                   />
                ),
