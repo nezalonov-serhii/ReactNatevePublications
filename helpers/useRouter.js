@@ -1,12 +1,10 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import { LoginScreen } from "../Screens/Auth/LoginScreen/LoginScreen";
 import { RegistrationScreen } from "../Screens/Auth/RegistrationScreen/RegistrationScreen";
 import { Home } from "../Screens/Home";
 
 const AuthStack = createStackNavigator();
-const MainTab = createBottomTabNavigator();
 
 export const useRoute = (isAuth, setIsAuth) => {
    if (!isAuth) {
