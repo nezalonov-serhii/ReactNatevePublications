@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { styles } from "../Auth.styled";
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux"; // Импортируем хук useDispatch
+import { useDispatch } from "react-redux";
 import { loginAuth } from "../../../redux/slices/authSlice";
 
 export function RegistrationScreen({ navigation }) {
@@ -22,7 +22,7 @@ export function RegistrationScreen({ navigation }) {
    const [login, setLogin] = useState("");
    const [showPassword, setShowPassword] = useState(true);
 
-   const dispatch = useDispatch(); // Получаем функцию dispatch из хука useDispatch
+   const dispatch = useDispatch();
 
    const keyboardHide = () => {
       setIsShowKeyboard(false);
