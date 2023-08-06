@@ -13,10 +13,7 @@ export default function App() {
       "Roboto-Bold": require("./assets/font/Roboto-Bold.ttf"),
    });
 
-   // let isAuth = false;
    const [isAuth, setIsAuth] = useState(false);
-
-   // const routing = useRoute(isAuth);
 
    if (!fontsLoaded) {
       return null;
