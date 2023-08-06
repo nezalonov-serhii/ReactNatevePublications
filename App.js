@@ -1,13 +1,10 @@
 import "react-native-gesture-handler";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-
 import { useFonts } from "expo-font";
+import { NavigationContainer } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler"; // Добавьте эту строку
 
-import { LoginScreen } from "./Screens/Auth/LoginScreen/LoginScreen";
-import RegistrationScreen from "./Screens/Auth/RegistrationScreen/RegistrationScreen";
-
-const AuthStack = createStackNavigator();
+import { useRoute } from "./helpers/useRouter";
+import { useState } from "react";
 
 export default function App() {
    const [fontsLoaded] = useFonts({
@@ -16,26 +13,20 @@ export default function App() {
       "Roboto-Bold": require("./assets/font/Roboto-Bold.ttf"),
    });
 
+   // let isAuth = false;
+   const [isAuth, setIsAuth] = useState(false);
+
+   // const routing = useRoute(isAuth);
+
    if (!fontsLoaded) {
       return null;
    }
 
    if (fontsLoaded) {
       return (
-         <NavigationContainer>
-            <AuthStack.Navigator>
-               <AuthStack.Screen
-                  options={{ headerShown: false }}
-                  name="Login"
-                  component={LoginScreen}
-               />
-               <AuthStack.Screen
-                  options={{ headerShown: false }}
-                  name="Register"
-                  component={RegistrationScreen}
-               />
-            </AuthStack.Navigator>
-         </NavigationContainer>
+         <GestureHandlerRootView style={{ flex: 1 }}>
+            <NavigationContainer>{useRoute(isAuth, setIsAuth)}</NavigationContainer>
+         </GestureHandlerRootView>
       );
    }
 

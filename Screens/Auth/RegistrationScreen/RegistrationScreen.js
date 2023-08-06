@@ -13,12 +13,14 @@ import {
 import { styles } from "../Auth.styled";
 import { useState, useEffect } from "react";
 
-export default function RegistrationScreen({ navigation }) {
+export function RegistrationScreen({ navigation, route }) {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [login, setLogin] = useState("");
    const [showPassword, setShowPassword] = useState(true);
+
+   const setIsAuth = route.params.setIsAuth;
 
    const keyboardHide = () => {
       setIsShowKeyboard(false);
@@ -29,7 +31,8 @@ export default function RegistrationScreen({ navigation }) {
       setIsShowKeyboard(false);
       Keyboard.dismiss();
 
-      console.log({ password, email, login });
+      setIsAuth(true);
+      console.log({ email, password, login });
 
       setEmail("");
       setPassword("");

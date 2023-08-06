@@ -12,11 +12,13 @@ import {
 } from "react-native";
 import { styles } from "../Auth.styled";
 
-export function LoginScreen({ navigation }) {
+export function LoginScreen({ navigation, route }) {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [showPassword, setShowPassword] = useState(true);
+
+   const setIsAuth = route.params.setIsAuth;
 
    const keyboardHide = () => {
       setIsShowKeyboard(false);
@@ -27,6 +29,7 @@ export function LoginScreen({ navigation }) {
       setIsShowKeyboard(false);
       Keyboard.dismiss();
 
+      setIsAuth(true);
       console.log({ email, password });
 
       setEmail("");
