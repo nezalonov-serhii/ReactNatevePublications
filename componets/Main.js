@@ -7,8 +7,6 @@ import { useRouter } from "../helpers/useRouter";
 
 export const Main = () => {
    const isAuth = useSelector(selectIsAuth);
-   console.log(isAuth);
-
    const routing = useRouter(isAuth);
    return <NavigationContainer>{routing}</NavigationContainer>;
 };
