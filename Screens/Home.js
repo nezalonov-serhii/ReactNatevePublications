@@ -7,12 +7,10 @@ import { CreateScreen } from "../Screens/MainScreen/CreateScreen/CreateScreen";
 import { ProfileScreen } from "../Screens/MainScreen/ProfileScreen/ProfileScreen";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch } from "react-redux";
-import { logoutAuth } from "../redux/slices/authSlice";
 
 const MainTab = createBottomTabNavigator();
 
 export const Home = () => {
-   const dispatch = useDispatch();
    return (
       <MainTab.Navigator
          screenOptions={{
@@ -26,22 +24,13 @@ export const Home = () => {
          }}
       >
          <MainTab.Screen
+            name="Posts"
+            component={PostsScreen}
             options={{
-               headerTitle: "Публікації",
-               headerTitleAlign: "center",
                tabBarHideOnKeyboard: true,
                tabBarShowLabel: false,
-               headerRight: () => (
-                  <Ionicons
-                     name="log-out-outline"
-                     size={24}
-                     color="black"
-                     style={{ marginRight: 16 }}
-                     onPress={() => {
-                        dispatch(logoutAuth());
-                     }}
-                  />
-               ),
+               headerShown: false,
+
                tabBarIcon: ({ focused, size, color }) => {
                   return (
                      <View
@@ -65,10 +54,10 @@ export const Home = () => {
                   );
                },
             }}
-            name="Posts"
-            component={PostsScreen}
          />
          <MainTab.Screen
+            name="Create"
+            component={CreateScreen}
             options={({ navigation }) => ({
                headerLeft: () => (
                   <TouchableOpacity
@@ -111,10 +100,10 @@ export const Home = () => {
                   );
                },
             })}
-            name="Create"
-            component={CreateScreen}
          />
          <MainTab.Screen
+            name="ProfileScreen"
+            component={ProfileScreen}
             options={{
                headerShown: false,
                tabBarHideOnKeyboard: true,
@@ -142,8 +131,6 @@ export const Home = () => {
                   );
                },
             }}
-            name="ProfileScreen"
-            component={ProfileScreen}
          />
       </MainTab.Navigator>
    );

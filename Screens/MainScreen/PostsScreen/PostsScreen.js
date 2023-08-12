@@ -1,34 +1,55 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, Image } from "react-native";
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { Ionicons } from "@expo/vector-icons";
 
-export const PostsScreen = ({ route }) => {
-   console.log(route.params);
+import { MapScreen } from "./NestedScreen/MapScreen";
+import { CommentsScreen } from "./NestedScreen/CommentsScreen";
+import { DefaultScreen } from "./NestedScreen/DefaultScreen";
+import { useDispatch } from "react-redux";
+import { logoutAuth } from "../../../redux/slices/authSlice";
 
-   const [posts, setPosts] = useState([]);
+const NestedScreen = createStackNavigator();
 
-   useEffect(() => {
-      if (route.params) setPosts((prevState) => [...prevState, route.params]);
-   }, [route.params]);
+export const PostsScreen = () => {
+   const dispatch = useDispatch();
 
    return (
-      <View style={styles.container}>
-         <FlatList
-            data={posts}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-               <View>
-                  <Image source={{ uri: item.photo }} style={{ width: 350, height: 200 }} />
-               </View>
-            )}
+      <NestedScreen.Navigator>
+         <NestedScreen.Screen
+            name="DefaultScreen"
+            component={DefaultScreen}
+            options={{
+               headerTitle: "Публікації",
+               headerTitleAlign: "center",
+               headerRight: () => (
+                  <Ionicons
+                     name="log-out-outline"
+                     size={24}
+                     color="black"
+                     style={{ marginRight: 16 }}
+                     onPress={() => {
+                        dispatch(logoutAuth());
+                     }}
+                  />
+               ),
+            }}
          />
-      </View>
+         <NestedScreen.Screen
+            name="Maps"
+            component={MapScreen}
+            options={{
+               headerTitle: "Карти",
+               headerTitleAlign: "center",
+            }}
+         />
+         <NestedScreen.Screen
+            name="Comments"
+            component={CommentsScreen}
+            options={{
+               headerTitle: "Коментарі",
+               headerTitleAlign: "center",
+            }}
+         />
+      </NestedScreen.Navigator>
    );
 };
-
-styles = StyleSheet.create({
-   container: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-   },
-});

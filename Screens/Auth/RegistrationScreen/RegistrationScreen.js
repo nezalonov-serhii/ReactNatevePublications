@@ -33,8 +33,8 @@ export function RegistrationScreen({ navigation }) {
       setIsShowKeyboard(false);
       Keyboard.dismiss();
 
-      dispatch(loginAuth());
-      console.log({ email, password, login });
+      // dispatch(loginAuth());
+      // console.log({ email, password, login });
 
       setEmail("");
       setPassword("");

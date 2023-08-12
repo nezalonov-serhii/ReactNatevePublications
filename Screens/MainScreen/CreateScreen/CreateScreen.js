@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
+import * as Location from "expo-location";
 
 import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,36 +20,42 @@ import {
 
 export const CreateScreen = ({ navigation }) => {
    const [photoName, setPhotoName] = useState("");
-   const [photoLocation, setPhotoLocation] = useState("");
    const [camera, setCamera] = useState(null);
    const [photo, setPhoto] = useState(null);
    const [hasPermission, setHasPermission] = useState(null);
+   const [errorMsg, setErrorMsg] = useState(null);
+   const [photoLocation, setPhotoLocation] = useState({});
+   const [locationInfo, setLocationInfo] = useState("");
 
    useEffect(() => {
       (async () => {
-         const { status } = await Camera.requestCameraPermissionsAsync();
-         await MediaLibrary.requestPermissionsAsync();
+         const cameraStatus = await Camera.requestCameraPermissionsAsync();
+         const mediaLibraryStatus = await MediaLibrary.requestPermissionsAsync();
+         const locationStatus = await Location.requestForegroundPermissionsAsync();
 
-         setHasPermission(status === "granted");
+         setHasPermission(cameraStatus.status === "granted");
+
+         if (mediaLibraryStatus.status !== "granted") {
+            setErrorMsg("Permission to access media library was denied");
+         }
+
+         if (locationStatus.status !== "granted") {
+            setErrorMsg("Permission to access location was denied");
+         }
       })();
    }, []);
 
-   const keyboardHide = () => {
-      Keyboard.dismiss();
-   };
+   const fetchLocationInfo = async (photoLocation) => {
+      try {
+         const geocode = await Location.reverseGeocodeAsync({
+            latitude: photoLocation.latitude,
+            longitude: photoLocation.longitude,
+         });
 
-   const handelSubmit = () => {
-      Keyboard.dismiss();
-
-      navigation.navigate("Posts", {
-         photo,
-         photoName,
-         photoLocation,
-      });
-
-      setPhoto(null);
-      setPhotoName("");
-      setPhotoLocation("");
+         setLocationInfo(`${geocode[0].city}, ${geocode[0].country}`);
+      } catch (error) {
+         console.error("Error fetching location info:", error);
+      }
    };
 
    const takePhoto = async () => {
@@ -56,11 +63,35 @@ export const CreateScreen = ({ navigation }) => {
          const { uri } = await camera.takePictureAsync();
          await MediaLibrary.createAssetAsync(uri);
          setPhoto(uri);
+
+         const location = await Location.getCurrentPositionAsync();
+
+         fetchLocationInfo(location.coords);
+         setPhotoLocation(location.coords);
       }
    };
 
+   const handelSubmit = () => {
+      Keyboard.dismiss();
+
+      navigation.navigate("DefaultScreen", {
+         photo,
+         photoName,
+         photoLocation,
+         locationInfo,
+      });
+
+      setPhoto(null);
+      setPhotoLocation({});
+      setPhotoName("");
+      setLocationInfo("");
+   };
+
+   const keyboardHide = () => {
+      Keyboard.dismiss();
+   };
+
    const pickImage = async () => {
-      console.log(camera);
       const result = await ImagePicker.launchImageLibraryAsync({
          mediaTypes: ImagePicker.MediaTypeOptions.Images,
          allowsEditing: true,
@@ -69,6 +100,11 @@ export const CreateScreen = ({ navigation }) => {
       });
 
       if (!result.canceled) {
+         const location = await Location.getCurrentPositionAsync();
+
+         fetchLocationInfo(location.coords);
+         setPhotoLocation(location.coords);
+
          setPhoto(result.assets[0].uri);
       }
    };
@@ -133,8 +169,8 @@ export const CreateScreen = ({ navigation }) => {
                   <TextInput
                      placeholder="Місцевість"
                      style={styles.inputTitle}
-                     value={photoLocation}
-                     onChangeText={setPhotoLocation}
+                     value={locationInfo}
+                     onChangeText={setLocationInfo}
                   />
 
                   <Ionicons

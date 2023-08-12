@@ -32,7 +32,7 @@ export function LoginScreen({ navigation }) {
       Keyboard.dismiss();
 
       dispatch(loginAuth());
-      console.log({ email, password });
+      // console.log({ email, password });
 
       setEmail("");
       setPassword("");
