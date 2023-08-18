@@ -13,7 +13,7 @@ import {
 import { styles } from "../Auth.styled";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { loginAuth } from "../../../redux/slices/authSlice";
+import { authSingUpUser } from "../../../redux/operations/authOperations";
 
 export function RegistrationScreen({ navigation }) {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
@@ -33,7 +33,7 @@ export function RegistrationScreen({ navigation }) {
       setIsShowKeyboard(false);
       Keyboard.dismiss();
 
-      // dispatch(loginAuth());
+      dispatch(authSingUpUser({ email, password, login }));
       // console.log({ email, password, login });
 
       setEmail("");

@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { styles } from "../Auth.styled";
 import { loginAuth } from "../../../redux/slices/authSlice";
+import { authSingInUser } from "../../../redux/operations/authOperations";
 
 export function LoginScreen({ navigation }) {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
@@ -31,7 +32,7 @@ export function LoginScreen({ navigation }) {
       setIsShowKeyboard(false);
       Keyboard.dismiss();
 
-      dispatch(loginAuth());
+      dispatch(authSingInUser({ email, password }));
       // console.log({ email, password });
 
       setEmail("");

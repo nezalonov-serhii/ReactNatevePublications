@@ -3,8 +3,9 @@ import { useFonts } from "expo-font";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { Provider } from "react-redux";
-import { store } from "./redux/store";
 import { Main } from "./componets/Main";
+import { persistor, store } from "./redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 export default function App() {
    const [fontsLoaded] = useFonts({
@@ -16,11 +17,12 @@ export default function App() {
    if (!fontsLoaded) return null;
 
    if (fontsLoaded) {
-
       return (
          <GestureHandlerRootView style={{ flex: 1 }}>
             <Provider store={store}>
-               <Main />
+               <PersistGate loading={null} persistor={persistor}>
+                  <Main />
+               </PersistGate>
             </Provider>
          </GestureHandlerRootView>
       );

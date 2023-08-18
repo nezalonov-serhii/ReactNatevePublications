@@ -17,6 +17,9 @@ import {
    Keyboard,
    KeyboardAvoidingView,
 } from "react-native";
+import { db, storage } from "../../../firebase/config";
+import { addDoc, collection } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const CreateScreen = ({ navigation }) => {
    const [photoName, setPhotoName] = useState("");
@@ -59,20 +62,20 @@ export const CreateScreen = ({ navigation }) => {
    };
 
    const takePhoto = async () => {
-      if (camera) {
-         const { uri } = await camera.takePictureAsync();
-         await MediaLibrary.createAssetAsync(uri);
-         setPhoto(uri);
+      const { uri } = await camera.takePictureAsync();
+      await MediaLibrary.createAssetAsync(uri);
+      setPhoto(uri);
 
-         const location = await Location.getCurrentPositionAsync();
+      const location = await Location.getCurrentPositionAsync();
 
-         fetchLocationInfo(location.coords);
-         setPhotoLocation(location.coords);
-      }
+      fetchLocationInfo(location.coords);
+      setPhotoLocation(location.coords);
    };
 
    const handelSubmit = () => {
       Keyboard.dismiss();
+
+      writeDataToFirestore();
 
       navigation.navigate("DefaultScreen", {
          photo,
@@ -85,6 +88,34 @@ export const CreateScreen = ({ navigation }) => {
       setPhotoLocation({});
       setPhotoName("");
       setLocationInfo("");
+   };
+
+   const uploadImageToStorage = async () => {
+      console.log(photo);
+
+      const response = await fetch(photo);
+
+      const file = await response.blob();
+      const uniquePostId = Date.now().toString();
+      const storageImage = await ref(storage, `postImage/${uniquePostId}`);
+      await uploadBytes(storageImage, file);
+      const addedPhoto = await getDownloadURL(storageImage);
+      // console.log(addedPhoto)
+      return addedPhoto;
+   };
+
+   const writeDataToFirestore = async () => {
+      try {
+         const imageUrl = await uploadImageToStorage();
+         const docRef = await addDoc(collection(db, `posts`), {
+            photo: imageUrl,
+            photoName,
+            photoLocation,
+            locationInfo,
+         });
+      } catch (e) {
+         console.error("Error adding document: ", e);
+      }
    };
 
    const keyboardHide = () => {

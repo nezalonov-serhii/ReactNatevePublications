@@ -11,12 +11,22 @@ import {
    StyleSheet,
 } from "react-native";
 
+import { collection, query, onSnapshot } from "firebase/firestore";
+import { db } from "../../../../firebase/config";
+
 export const DefaultScreen = ({ navigation, route }) => {
    const [posts, setPosts] = useState([]);
 
+   const getAllPost = async () => {
+      const postsRef = query(collection(db, "posts"));
+      onSnapshot(postsRef, (snapshot) => {
+         setPosts(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      });
+   };
+
    useEffect(() => {
-      if (route.params) setPosts((prevState) => [...prevState, route.params]);
-   }, [route.params]);
+      getAllPost();
+   }, []);
 
    return (
       <View style={{ flex: 1 }}>

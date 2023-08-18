@@ -6,7 +6,7 @@ import { MapScreen } from "./NestedScreen/MapScreen";
 import { CommentsScreen } from "./NestedScreen/CommentsScreen";
 import { DefaultScreen } from "./NestedScreen/DefaultScreen";
 import { useDispatch } from "react-redux";
-import { logoutAuth } from "../../../redux/slices/authSlice";
+import { authSingOutUser } from "../../../redux/operations/authOperations";
 
 const NestedScreen = createStackNavigator();
 
@@ -28,7 +28,7 @@ export const PostsScreen = () => {
                      color="black"
                      style={{ marginRight: 16 }}
                      onPress={() => {
-                        dispatch(logoutAuth());
+                        dispatch(authSingOutUser());
                      }}
                   />
                ),
