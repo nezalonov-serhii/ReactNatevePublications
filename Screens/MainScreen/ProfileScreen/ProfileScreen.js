@@ -13,11 +13,12 @@ import {
    Keyboard,
 } from "react-native";
 
-import { db } from "../../../firebase/config";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, addDoc } from "firebase/firestore";
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
-import { authSingOutUser } from "../../../redux/operations/authOperations";
+import { authSingOutUser, userUpdateAvatar } from "../../../redux/operations/authOperations";
+import { db, storage } from "../../../firebase/config";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const width = Dimensions.get("window").width;
 
@@ -26,11 +27,11 @@ export const ProfileScreen = ({ navigation }) => {
    const [isShowKeyboard, setIsShowKeyboard] = useState(false);
    const [posts, setPosts] = useState([]);
    const dispatch = useDispatch();
-   const { userId, nickName } = useSelector((state) => state.auth);
+   const { userId, nickName, avatarUser } = useSelector((state) => state.auth);
 
    useEffect(() => {
       const getUserPost = async () => {
-         const postsRef = collection(db, "post");
+         const postsRef = collection(db, "posts");
          const queryRef = query(postsRef, where("userId", "==", userId));
 
          const unsubscribe = onSnapshot(queryRef, (snapshot) => {
@@ -64,15 +65,54 @@ export const ProfileScreen = ({ navigation }) => {
          quality: 1,
       });
 
-      // console.log(result);
-
       if (!result.canceled) {
-         setImage(result.assets[0].uri);
+         const avatar = await uploadImageAndSaveToFirestore(result.assets[0].uri);
+
+         dispatch(userUpdateAvatar({ avatar }));
       } else {
          setImage(null);
       }
    };
 
+   uriToBlob = async (uri) => {
+      return await new Promise((resolve, reject) => {
+         const xhr = new XMLHttpRequest();
+         xhr.onload = function () {
+            // return the blob
+            resolve(xhr.response);
+         };
+         xhr.onerror = function () {
+            reject(new Error("uriToBlob failed"));
+         };
+         xhr.responseType = "blob";
+         xhr.open("GET", uri, true);
+
+         xhr.send(null);
+      });
+   };
+
+   const uploadImageAndSaveToFirestore = async (imageUri) => {
+      try {
+         const imageBlob = await uriToBlob(imageUri);
+         const uniqueAvatarId = Date.now().toString();
+         const storageImageRef = ref(storage, `avatar/${uniqueAvatarId}`);
+
+         await uploadBytes(storageImageRef, imageBlob);
+
+         const imageUrl = await getDownloadURL(storageImageRef);
+
+         const avatarData = {
+            avatar: imageUrl,
+         };
+
+         await addDoc(collection(db, "avatar"), avatarData);
+
+         return imageUrl;
+      } catch (error) {
+         console.log(error);
+         return null;
+      }
+   };
    return (
       <TouchableWithoutFeedback onPress={closeKeyboard}>
          <ImageBackground source={require("../../../assets/image/bgAuth.jpg")} style={styles.image}>
@@ -80,27 +120,16 @@ export const ProfileScreen = ({ navigation }) => {
                <View style={{ ...styles.wrapper, flex: isShowKeyboard ? 0.8 : 0.7 }}>
                   <View style={{ ...styles.avatarWrapper, left: (width - 120) / 2 }}>
                      <TouchableOpacity onPress={pickImage}>
-                        {image && (
-                           <Image
-                              source={{ uri: image }}
-                              style={{ width: 120, height: 120, borderRadius: 16 }}
-                           />
-                        )}
-                        {!image && (
-                           <Image
-                              fadeDuration={0}
-                              style={styles.add}
-                              source={require("../../../assets/image/add.png")}
-                           />
-                        )}
+                        <Image
+                           source={{ uri: avatarUser }}
+                           style={{ width: 120, height: 120, borderRadius: 16 }}
+                        />
 
-                        {image && (
-                           <Image
-                              fadeDuration={0}
-                              style={styles.remove}
-                              source={require("../../../assets/image/remove.png")}
-                           />
-                        )}
+                        <Image
+                           fadeDuration={0}
+                           style={styles.add}
+                           source={require("../../../assets/image/add.png")}
+                        />
                      </TouchableOpacity>
                   </View>
                   <Text style={styles.name}>{nickName}</Text>
@@ -111,12 +140,11 @@ export const ProfileScreen = ({ navigation }) => {
                      data={posts}
                      keyExtractor={(item) => item.id}
                      renderItem={({ item }) => (
-                        <View style={styles.postContainer}>
+                        <TouchableOpacity style={styles.postContainer}>
                            <Image source={{ uri: item.photo }} style={styles.photo} />
 
                            <View>
-                              <Text style={styles.description}>{item.photoLocation}</Text>
-                              <Text style={styles.title}>{item.photoTitle}</Text>
+                              <Text style={styles.title}>{item.photoName}</Text>
                            </View>
                            <View
                               style={{
@@ -132,18 +160,28 @@ export const ProfileScreen = ({ navigation }) => {
                                        photo: item.photo,
                                     })
                                  }
+                                 style={{
+                                    flexDirection: "row",
+                                 }}
                               >
                                  <EvilIcons name="comment" size={24} color="#BDBDBD" />
+                                 <Text>{item.commentCount ? item.commentCount : "0"}</Text>
                               </TouchableOpacity>
                               <TouchableOpacity
+                                 style={{
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    marginTop: 8,
+                                 }}
                                  onPress={() =>
-                                    navigation.navigate("Maps", { location: item.location })
+                                    navigation.navigate("Maps", { location: item.photoLocation })
                                  }
                               >
                                  <Feather name="map-pin" size={24} color="#BDBDBD" />
+                                 <Text style={styles.description}>{item.locationInfo}</Text>
                               </TouchableOpacity>
                            </View>
-                        </View>
+                        </TouchableOpacity>
                      )}
                   />
                </View>
@@ -182,24 +220,22 @@ const styles = StyleSheet.create({
    },
    postContainer: {
       marginBottom: 20,
-      borderWidth: 1,
-      borderColor: "#E1E1E1",
-      borderRadius: 10,
       padding: 10,
-      // marginTop: 60,
    },
    photo: {
-      width: 343,
+      width: "100%",
       height: 240,
+      marginBottom: 8,
+      borderRadius: 10,
    },
    locationBox: {
       flexDirection: "row",
       alignItems: "center",
-      marginTop: 10,
       marginLeft: 200,
       flex: 0.6,
    },
    title: {
+      width: "100%",
       marginRight: 310,
       marginBottom: 8,
       fontSize: 16,
@@ -207,6 +243,7 @@ const styles = StyleSheet.create({
       marginTop: 10,
    },
    description: {
+      marginLeft: 8,
       fontSize: 14,
       color: "#212121",
       fontSize: 16,

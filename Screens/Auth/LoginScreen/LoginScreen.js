@@ -33,7 +33,6 @@ export function LoginScreen({ navigation }) {
       Keyboard.dismiss();
 
       dispatch(authSingInUser({ email, password }));
-      // console.log({ email, password });
 
       setEmail("");
       setPassword("");

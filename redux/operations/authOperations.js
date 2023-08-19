@@ -11,7 +11,7 @@ import { authSlice } from "../slices/authSlice";
 const { updateUserProfile, authSingOut } = authSlice.actions;
 
 export const authSingUpUser =
-   ({ email, password, login }) =>
+   ({ email, password, login, avatar }) =>
    async (dispatch, getState) => {
       try {
          await createUserWithEmailAndPassword(auth, email, password);
@@ -19,12 +19,42 @@ export const authSingUpUser =
 
          await updateProfile(user, {
             displayName: login,
+            photoURL: avatar,
          });
-         const { uid, displayName } = await auth.currentUser;
+         const { uid, displayName, photoURL } = await auth.currentUser;
+
          const userUpdateProfile = {
             userId: uid,
             nickName: displayName,
             isAuth: true,
+            avatarUser: photoURL,
+         };
+
+         dispatch(updateUserProfile(userUpdateProfile));
+      } catch (error) {
+         console.log(error);
+         console.log(error.message);
+      }
+   };
+
+export const userUpdateAvatar =
+   ({ avatar }) =>
+   async (dispatch, getState) => {
+      try {
+         const user = await auth.currentUser;
+
+         await updateProfile(user, {
+            photoURL: avatar,
+         });
+         const { photoURL, uid, displayName } = await auth.currentUser;
+
+         console.log(photoURL);
+
+         const userUpdateProfile = {
+            userId: uid,
+            nickName: displayName,
+            isAuth: true,
+            avatarUser: photoURL,
          };
 
          dispatch(updateUserProfile(userUpdateProfile));
@@ -56,6 +86,7 @@ export const authStateChangeUser = () => async (dispatch, getState) => {
             userId: user.uid,
             nickName: user.displayName,
             isAuth: true,
+            avatarUser: user.photoURL,
          };
          dispatch(updateUserProfile(userUpdateProfile));
       }

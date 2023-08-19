@@ -65,6 +65,7 @@ export const DefaultScreen = ({ navigation, route }) => {
                         }}
                         onPress={() =>
                            navigation.navigate("Comments", {
+                              id: item.id,
                               photo: item.photo,
                            })
                         }
@@ -75,7 +76,7 @@ export const DefaultScreen = ({ navigation, route }) => {
                               marginLeft: 6,
                            }}
                         >
-                           1
+                           {item.commentCount ? item.commentCount : "0"}
                         </Text>
                      </TouchableOpacity>
                      <TouchableOpacity

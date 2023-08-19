@@ -17,9 +17,10 @@ import {
    Keyboard,
    KeyboardAvoidingView,
 } from "react-native";
-import { db, storage } from "../../../firebase/config";
+import { auth, db, storage } from "../../../firebase/config";
 import { addDoc, collection } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { uriToBlob } from "../../../helpers/uriToBlob";
 
 export const CreateScreen = ({ navigation }) => {
    const [photoName, setPhotoName] = useState("");
@@ -63,6 +64,7 @@ export const CreateScreen = ({ navigation }) => {
 
    const takePhoto = async () => {
       const { uri } = await camera.takePictureAsync();
+
       await MediaLibrary.createAssetAsync(uri);
       setPhoto(uri);
 
@@ -70,56 +72,6 @@ export const CreateScreen = ({ navigation }) => {
 
       fetchLocationInfo(location.coords);
       setPhotoLocation(location.coords);
-   };
-
-   const handelSubmit = () => {
-      Keyboard.dismiss();
-
-      writeDataToFirestore();
-
-      navigation.navigate("DefaultScreen", {
-         photo,
-         photoName,
-         photoLocation,
-         locationInfo,
-      });
-
-      setPhoto(null);
-      setPhotoLocation({});
-      setPhotoName("");
-      setLocationInfo("");
-   };
-
-   const uploadImageToStorage = async () => {
-      console.log(photo);
-
-      const response = await fetch(photo);
-
-      const file = await response.blob();
-      const uniquePostId = Date.now().toString();
-      const storageImage = await ref(storage, `postImage/${uniquePostId}`);
-      await uploadBytes(storageImage, file);
-      const addedPhoto = await getDownloadURL(storageImage);
-      // console.log(addedPhoto)
-      return addedPhoto;
-   };
-
-   const writeDataToFirestore = async () => {
-      try {
-         const imageUrl = await uploadImageToStorage();
-         const docRef = await addDoc(collection(db, `posts`), {
-            photo: imageUrl,
-            photoName,
-            photoLocation,
-            locationInfo,
-         });
-      } catch (e) {
-         console.error("Error adding document: ", e);
-      }
-   };
-
-   const keyboardHide = () => {
-      Keyboard.dismiss();
    };
 
    const pickImage = async () => {
@@ -138,6 +90,49 @@ export const CreateScreen = ({ navigation }) => {
 
          setPhoto(result.assets[0].uri);
       }
+   };
+
+   const handelSubmit = () => {
+      Keyboard.dismiss();
+
+      writeDataToFirestore();
+
+      navigation.navigate("DefaultScreen");
+
+      setPhoto(null);
+      setPhotoLocation({});
+      setPhotoName("");
+      setLocationInfo("");
+   };
+
+   const uploadImageToStorage = async () => {
+      const file = await uriToBlob(photo);
+      const uniquePostId = Date.now().toString();
+      const storageImage = await ref(storage, `postImage/${uniquePostId}`);
+      await uploadBytes(storageImage, file);
+      const addedPhoto = await getDownloadURL(storageImage);
+
+      return addedPhoto;
+   };
+
+   const writeDataToFirestore = async () => {
+      try {
+         const { uid } = auth.currentUser;
+         const imageUrl = await uploadImageToStorage();
+         const docRef = await addDoc(collection(db, `posts`), {
+            photo: imageUrl,
+            photoName,
+            photoLocation,
+            locationInfo,
+            userId: uid,
+         });
+      } catch (e) {
+         console.error("Error adding document: ", e);
+      }
+   };
+
+   const keyboardHide = () => {
+      Keyboard.dismiss();
    };
 
    return (
