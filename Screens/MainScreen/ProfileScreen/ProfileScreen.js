@@ -140,7 +140,7 @@ export const ProfileScreen = ({ navigation }) => {
                      data={posts}
                      keyExtractor={(item) => item.id}
                      renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.postContainer}>
+                        <TouchableOpacity style={styles.postContainer} activeOpacity={1}>
                            <Image source={{ uri: item.photo }} style={styles.photo} />
 
                            <View>
