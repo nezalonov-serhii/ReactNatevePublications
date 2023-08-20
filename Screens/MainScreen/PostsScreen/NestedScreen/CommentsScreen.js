@@ -96,7 +96,10 @@ export const CommentsScreen = ({ route }) => {
                               backgroundColor: "#35b1ff2b",
                            }}
                         >
-                           <Text style={styles.comment}>{item.text}</Text>
+                           <Text style={{ marginTop: -10, marginBottom: 5, fontSize: 18 }}>
+                              {item.nickName}
+                           </Text>
+                           <Text style={{ ...styles.comment, marginBottom: 10 }}>{item.text}</Text>
                            <Text style={styles.data}>{item.data}</Text>
                         </View>
                         <View style={{ marginLeft: 16, marginRight: 16 }}>
@@ -125,6 +128,9 @@ export const CommentsScreen = ({ route }) => {
                            />
                         </View>
                         <View style={styles.commentWrapper}>
+                           <Text style={{ marginTop: -10, marginBottom: 5, fontSize: 18 }}>
+                              {item.nickName}
+                           </Text>
                            <Text style={styles.comment}>{item.text}</Text>
                            <Text style={styles.data}>{item.data}</Text>
                         </View>

@@ -30,6 +30,7 @@ export const ProfileScreen = ({ navigation }) => {
    const { userId, nickName, avatarUser } = useSelector((state) => state.auth);
 
    useEffect(() => {
+      console.log("qwe");
       const getUserPost = async () => {
          const postsRef = collection(db, "posts");
          const queryRef = query(postsRef, where("userId", "==", userId));
